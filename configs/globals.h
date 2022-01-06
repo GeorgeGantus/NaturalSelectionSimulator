@@ -1,0 +1,6 @@
+#define SIZE 10
+#define FOOD_AMOUNT 20
+#define FOOD_SIZE 0.6
+#define START_POPULATION 2
+#define MOVES_PER_TURN 20
+#define GENERATIONS 10
