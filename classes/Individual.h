@@ -11,9 +11,9 @@ class Individual {
     int y;
     pair<int, int> home;
     set<pair<int, int>> path;
-    vector<float> genes;  //beak size,
 
    public:
+    vector<float> genes;  //beak size,
     int foodEated;
     Individual(int x, int y);
     void move(int limit, int (*food)[SIZE]);

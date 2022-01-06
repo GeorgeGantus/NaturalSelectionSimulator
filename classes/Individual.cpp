@@ -63,8 +63,10 @@ void Individual::setHome(int x, int y) {
     home.second = y;
 }
 void Individual::eat() {
-    if (genes[0] > FOOD_SIZE * 1.5) {
-        foodEated += (1 + (FOOD_SIZE * 1.5 - genes[0])) * 20;
+    if (genes[0] / FOOD_SIZE > 1.5) {
+        foodEated += (1 - ((genes[0] / FOOD_SIZE) / 10)) * 20;
+    } else {
+        foodEated += (genes[0] / FOOD_SIZE) * 20;
     }
     //foodEated++;
 }

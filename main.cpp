@@ -50,11 +50,30 @@ Individual born(Individual parent) {
     int y = rand() % SIZE;
     aux.foodEated = 0;
     aux.setHome(x, y);
+    float randm = (float)rand() / RAND_MAX;
+    float mutation = (((float)rand() / RAND_MAX) * MUTATION_RATE);
+    if (randm > 0.5) {
+        aux.genes[0] = aux.genes[0] + mutation;
+    } else {
+        aux.genes[0] = aux.genes[0] - mutation;
+    }
+
     return aux;
+}
+
+void meanBeakSize(vector<Individual> population) {
+    vector<Individual>::iterator it;
+    float sum = 0;
+    for (it = population.begin(); it < population.end(); it++) {
+        sum += (*it).genes[0];
+    }
+    cout << "BICO MEDIO: " << sum / population.size() << endl;
+    cout << "PROP: " << (sum / population.size()) / FOOD_SIZE << endl;
 }
 
 int main(int argc, char const *argv[]) {
     srand(10);
+    bool extintion = false;
     //start enviroment
     int enviroment[SIZE][SIZE];
     startEnviroment(enviroment);
@@ -67,14 +86,14 @@ int main(int argc, char const *argv[]) {
         generateFood(enviroment);
         sumFood(enviroment);
 
-        if (k == 0) {
+        /* if (k == 0) {
             for (int i = 0; i < SIZE; i++) {
                 for (int j = 0; j < SIZE; j++) {
                     cout << enviroment[i][j] << " ";
                 }
                 cout << endl;
             }
-        }
+        } */
 
         //***********************************************
         //Move population
@@ -92,15 +111,15 @@ int main(int argc, char const *argv[]) {
         // cout << "Population SIZE: " << population.size() << endl;
         for (it = population.begin(); it < population.end(); it++) {
             // cout << "comeu: " << (*it).foodEated << endl;
-            // cout << (*it).foodEated << " ";
+            cout << (*it).foodEated << " ";
 
             bool erased = false;
             (*it).goHome();
-            if ((*it).foodEated >= 2) {
+            if ((*it).foodEated >= 58) {
                 newIndividuals.push_back(born(*it));
                 //toDuplicate++;
             }
-            if ((*it).foodEated == 0) {
+            if ((*it).foodEated < 15) {
                 population.erase(it--);
                 //toRemove++;
                 erased = true;
@@ -111,12 +130,24 @@ int main(int argc, char const *argv[]) {
             }
         }
         cout << endl;
+
+        if (population.size() == 0) {
+            extintion = true;
+            break;
+        }
+
         if (newIndividuals.size() != 0) {
             population.insert(population.end(), newIndividuals.begin(), newIndividuals.end());
             /* code */
         }
+        meanBeakSize(population);
         cout << "GERACAO " << k << ": pop->" << population.size() << endl;
         //**************************************
+    }
+
+    if (extintion) {
+        cout << "A Populacao foi extinta F" << endl;
+        /* code */
     }
 
     for (int i = 0; i < SIZE; i++) {
