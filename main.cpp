@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 #include <vector>
 
@@ -61,7 +62,7 @@ Individual born(Individual parent) {
     return aux;
 }
 
-void meanBeakSize(vector<Individual> population) {
+float meanBeakSize(vector<Individual> population) {
     vector<Individual>::iterator it;
     float sum = 0;
     for (it = population.begin(); it < population.end(); it++) {
@@ -69,9 +70,13 @@ void meanBeakSize(vector<Individual> population) {
     }
     cout << "BICO MEDIO: " << sum / population.size() << endl;
     cout << "PROP: " << (sum / population.size()) / FOOD_SIZE << endl;
+    return sum / population.size();
 }
 
 int main(int argc, char const *argv[]) {
+    ofstream graphicData;
+    graphicData.open("data.txt");
+    graphicData << SIZE << " " << FOOD_SIZE << " " << FOOD_AMOUNT << " " << MUTATION_RATE << " " << GENERATIONS << " " << START_POPULATION << endl;
     srand(10);
     bool extintion = false;
     //start enviroment
@@ -140,11 +145,12 @@ int main(int argc, char const *argv[]) {
             population.insert(population.end(), newIndividuals.begin(), newIndividuals.end());
             /* code */
         }
-        meanBeakSize(population);
+
         cout << "GERACAO " << k << ": pop->" << population.size() << endl;
+        graphicData << population.size() << " " << meanBeakSize(population) << endl;
         //**************************************
     }
-
+    graphicData << extintion;
     if (extintion) {
         cout << "A Populacao foi extinta F" << endl;
         /* code */

@@ -1,7 +1,7 @@
 #define SIZE 10
 #define MUTATION_RATE 0.05
-#define FOOD_AMOUNT 20
-#define FOOD_SIZE 0.2
+#define FOOD_AMOUNT 100
+#define FOOD_SIZE 0.75
 #define START_POPULATION 2
 #define MOVES_PER_TURN 20
-#define GENERATIONS 100
+#define GENERATIONS 800
