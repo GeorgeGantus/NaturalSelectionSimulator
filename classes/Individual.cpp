@@ -1,5 +1,6 @@
 #include "Individual.h"
 
+#include <math.h>
 #include <stdlib.h>
 
 #include <iostream>
@@ -13,6 +14,9 @@ Individual::Individual(int x, int y) {
     home.first = x;
     home.second = y;
     genes.push_back(0.5);
+    genes.push_back(1);
+    stepsToGo = genes[1] * 10;
+    stepsWent = 0;
     foodEated = 0;
 }
 
@@ -45,6 +49,10 @@ void Individual::move(int limit, int (*food)[SIZE]) {
         eat();
         // cout << "comeu na posicao (" << x << "," << y << ")" << endl;
     }
+
+    stepsToGo--;
+    stepsWent++;
+    foodEated -= ENVIROMENT_NOISE * pow(stepsWent, 2);
 }
 pair<int, int> Individual::getPosition() {
     pair<int, int> position;
@@ -56,6 +64,8 @@ pair<int, int> Individual::getPosition() {
 void Individual::goHome() {
     x = home.first;
     y = home.second;
+    stepsToGo = genes[1] * 10;
+    stepsWent = 0;
 }
 
 void Individual::setHome(int x, int y) {

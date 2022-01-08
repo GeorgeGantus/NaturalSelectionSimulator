@@ -3,6 +3,10 @@
         "iostream": "cpp",
         "set": "cpp",
         "fstream": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "queue": "cpp",
+        "array": "cpp",
+        "deque": "cpp",
+        "vector": "cpp"
     }
 }

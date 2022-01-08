@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+#include <queue>
 #include <vector>
 
 #include "classes/Individual.h"
@@ -55,20 +56,25 @@ Individual born(Individual parent) {
     float mutation = (((float)rand() / RAND_MAX) * MUTATION_RATE);
     if (randm > 0.5) {
         aux.genes[0] = aux.genes[0] + mutation;
+        aux.genes[1] = aux.genes[1] + mutation;
     } else {
         aux.genes[0] = aux.genes[0] - mutation;
+        aux.genes[1] = aux.genes[1] - mutation;
     }
-
+    aux.stepsToGo = aux.genes[1] * 10;
     return aux;
 }
 
 float meanBeakSize(vector<Individual> population) {
     vector<Individual>::iterator it;
     float sum = 0;
+    float sum2 = 0;
     for (it = population.begin(); it < population.end(); it++) {
         sum += (*it).genes[0];
+        sum2 += (*it).genes[1];
     }
     cout << "BICO MEDIO: " << sum / population.size() << endl;
+    cout << "VELOCIDADE MEDIA: " << sum2 / population.size() << endl;
     cout << "PROP: " << (sum / population.size()) / FOOD_SIZE << endl;
     return sum / population.size();
 }
@@ -101,13 +107,28 @@ int main(int argc, char const *argv[]) {
         } */
 
         //***********************************************
+        vector<Individual>::iterator itAux;
+        queue<Individual *> q;
+        for (itAux = population.begin(); itAux < population.end(); itAux++) {
+            if ((*itAux).stepsToGo > 0) {
+                //cout << (*itAux).stepsToGo << " ";
+                q.push(&(*itAux));
+            }
+        }
+        while (!q.empty()) {
+            q.front()->move(SIZE - 1, enviroment);
+            if (q.front()->stepsToGo > 0) {
+                q.push(q.front());
+            }
+            q.pop();
+        }
         //Move population
-        for (int i = 0; i < MOVES_PER_TURN; i++) {
+        /* for (int i = 0; i < MOVES_PER_TURN; i++) {
             vector<Individual>::iterator it;
             for (it = population.begin(); it < population.end(); it++) {
                 (*it).move(SIZE - 1, enviroment);
             }
-        }
+        } */
 
         vector<Individual>::iterator it;
         int toRemove = 0;
@@ -115,11 +136,10 @@ int main(int argc, char const *argv[]) {
         vector<Individual> newIndividuals;
         // cout << "Population SIZE: " << population.size() << endl;
         for (it = population.begin(); it < population.end(); it++) {
-            // cout << "comeu: " << (*it).foodEated << endl;
-            cout << (*it).foodEated << " ";
+            //cout << "comeu: " << (*it).foodEated << endl;
+            //cout << (*it).foodEated << " ";
 
             bool erased = false;
-            (*it).goHome();
             if ((*it).foodEated >= 58) {
                 newIndividuals.push_back(born(*it));
                 //toDuplicate++;
@@ -131,6 +151,7 @@ int main(int argc, char const *argv[]) {
             }
             if (!erased) {
                 (*it).foodEated = 0;
+                (*it).goHome();
                 /* code */
             }
         }

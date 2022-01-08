@@ -13,7 +13,9 @@ class Individual {
     set<pair<int, int>> path;
 
    public:
-    vector<float> genes;  //beak size,
+    int stepsToGo;
+    int stepsWent;
+    vector<float> genes;  //beak size, velocity
     int foodEated;
     Individual(int x, int y);
     void move(int limit, int (*food)[SIZE]);
