@@ -7,7 +7,7 @@
 using namespace std;
 #include "configs/globals.h"
 
-void sumFood(int (*food)[SIZE]) {
+int sumFood(int (*food)[SIZE]) {
     int k = 0;
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
@@ -15,7 +15,8 @@ void sumFood(int (*food)[SIZE]) {
             k += food[i][j];
         }
     }
-    cout << "Sobraram:" << k << endl;
+    //cout << "Sobraram:" << k << endl;
+    return k;
 }
 
 void startEnviroment(int (*enviroment)[SIZE]) {
@@ -53,30 +54,40 @@ Individual born(Individual parent) {
     aux.foodEated = 0;
     aux.setHome(x, y);
     float randm = (float)rand() / RAND_MAX;
+    float randm2 = (float)rand() / RAND_MAX;
     float mutation = (((float)rand() / RAND_MAX) * MUTATION_RATE);
+    float mutation2 = (((float)rand() / RAND_MAX) * MUTATION_RATE);
     if (randm > 0.5) {
         aux.genes[0] = aux.genes[0] + mutation;
-        aux.genes[1] = aux.genes[1] + mutation;
     } else {
         aux.genes[0] = aux.genes[0] - mutation;
-        aux.genes[1] = aux.genes[1] - mutation;
     }
+    if (randm2 > 0.5) {
+        aux.genes[1] = aux.genes[1] + mutation2;
+    } else {
+        aux.genes[1] = aux.genes[1] - mutation2;
+    }
+
     aux.stepsToGo = aux.genes[1] * 10;
     return aux;
 }
 
-float meanBeakSize(vector<Individual> population) {
+vector<float> meanBeakSize(vector<Individual> population) {
     vector<Individual>::iterator it;
-    float sum = 0;
-    float sum2 = 0;
+    vector<float> mean;
+    mean.push_back(0);
+    mean.push_back(0);
     for (it = population.begin(); it < population.end(); it++) {
-        sum += (*it).genes[0];
-        sum2 += (*it).genes[1];
+        mean[0] += (*it).genes[0];
+        mean[1] += (*it).genes[1];
     }
-    cout << "BICO MEDIO: " << sum / population.size() << endl;
-    cout << "VELOCIDADE MEDIA: " << sum2 / population.size() << endl;
-    cout << "PROP: " << (sum / population.size()) / FOOD_SIZE << endl;
-    return sum / population.size();
+
+    mean[0] = mean[0] / population.size();
+    mean[1] = mean[1] / population.size();
+    //cout << "BICO MEDIO: " << mean[0] << endl;
+    //cout << "VELOCIDADE MEDIA: " << mean[1] << endl;
+    //cout << "PROP: " << (mean[0]) / FOOD_SIZE << endl;
+    return mean;
 }
 
 int main(int argc, char const *argv[]) {
@@ -95,7 +106,7 @@ int main(int argc, char const *argv[]) {
     for (int k = 0; k < GENERATIONS; k++) {
         //generate food
         generateFood(enviroment);
-        sumFood(enviroment);
+        //sumFood(enviroment);
 
         /* if (k == 0) {
             for (int i = 0; i < SIZE; i++) {
@@ -140,7 +151,7 @@ int main(int argc, char const *argv[]) {
             //cout << (*it).foodEated << " ";
 
             bool erased = false;
-            if ((*it).foodEated >= 58) {
+            if ((*it).foodEated >= 70) {
                 newIndividuals.push_back(born(*it));
                 //toDuplicate++;
             }
@@ -155,7 +166,7 @@ int main(int argc, char const *argv[]) {
                 /* code */
             }
         }
-        cout << endl;
+        //cout << endl;
 
         if (population.size() == 0) {
             extintion = true;
@@ -167,8 +178,9 @@ int main(int argc, char const *argv[]) {
             /* code */
         }
 
-        cout << "GERACAO " << k << ": pop->" << population.size() << endl;
-        graphicData << population.size() << " " << meanBeakSize(population) << endl;
+        //cout << "GERACAO " << k << ": pop->" << population.size() << endl;
+        vector<float> mean = meanBeakSize(population);
+        graphicData << population.size() << " " << sumFood(enviroment) + FOOD_AMOUNT << " " << mean[0] << " " << mean[1] << endl;
         //**************************************
     }
     graphicData << extintion;
