@@ -92,7 +92,11 @@ vector<float> meanBeakSize(vector<Individual> population) {
 
 int main(int argc, char const *argv[]) {
     ofstream graphicData;
-    graphicData.open("data.txt");
+    ofstream movesData;
+    ofstream foodData;
+    graphicData.open("data5.txt");
+    movesData.open("moves.txt");
+    foodData.open("food.txt");
     graphicData << SIZE << " " << FOOD_SIZE << " " << FOOD_AMOUNT << " " << MUTATION_RATE << " " << GENERATIONS << " " << START_POPULATION << endl;
     srand(10);
     bool extintion = false;
@@ -102,23 +106,27 @@ int main(int argc, char const *argv[]) {
 
     //start population
     vector<Individual> population = startPopulation(SIZE);
+    vector<Individual>::iterator iterador;
 
     for (int k = 0; k < GENERATIONS; k++) {
         //generate food
         generateFood(enviroment);
-        //sumFood(enviroment);
-
-        /* if (k == 0) {
-            for (int i = 0; i < SIZE; i++) {
-                for (int j = 0; j < SIZE; j++) {
-                    cout << enviroment[i][j] << " ";
-                }
-                cout << endl;
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                foodData << enviroment[i][j] << " ";
             }
-        } */
+            foodData << endl;
+        }
+        movesData << population.size() << endl;
+
+        for (iterador = population.begin(); iterador < population.end(); iterador++) {
+            int first = (*iterador).getPosition().first;
+            int second = (*iterador).getPosition().second;
+            movesData << first << " " << second << endl;
+        }
 
         //***********************************************
-        vector<Individual>::iterator itAux;
+        /* vector<Individual>::iterator itAux;
         queue<Individual *> q;
         for (itAux = population.begin(); itAux < population.end(); itAux++) {
             if ((*itAux).stepsToGo > 0) {
@@ -132,14 +140,18 @@ int main(int argc, char const *argv[]) {
                 q.push(q.front());
             }
             q.pop();
-        }
+        } */
         //Move population
-        /* for (int i = 0; i < MOVES_PER_TURN; i++) {
+        for (int i = 0; i < MOVES_PER_TURN; i++) {
             vector<Individual>::iterator it;
             for (it = population.begin(); it < population.end(); it++) {
                 (*it).move(SIZE - 1, enviroment);
+                int first = (*it).getPosition().first;
+                int second = (*it).getPosition().second;
+                movesData << first << " " << second << endl;
             }
-        } */
+        }
+        movesData << "-1 -1 " << k << endl;
 
         vector<Individual>::iterator it;
         int toRemove = 0;
@@ -167,7 +179,7 @@ int main(int argc, char const *argv[]) {
             }
         }
         //cout << endl;
-
+        //movesData << population.size() << endl;
         if (population.size() == 0) {
             extintion = true;
             break;
@@ -195,6 +207,7 @@ int main(int argc, char const *argv[]) {
         }
         cout << endl;
     }
-
+    graphicData.close();
+    movesData.close();
     return 0;
 }
