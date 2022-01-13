@@ -52,7 +52,7 @@ void Individual::move(int limit, int (*food)[SIZE]) {
 
     stepsToGo--;
     stepsWent++;
-    foodEated -= ENVIROMENT_NOISE * pow(stepsWent, 2);
+    //foodEated -= ENVIROMENT_NOISE * pow(stepsWent, 2);
 }
 pair<int, int> Individual::getPosition() {
     pair<int, int> position;
