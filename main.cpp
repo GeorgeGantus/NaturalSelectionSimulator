@@ -6,7 +6,7 @@
 #include "classes/Individual.h"
 using namespace std;
 #include "configs/globals.h"
-
+//Metodo que retorna o total de comida disponivel no ambiente
 int sumFood(int (*food)[SIZE]) {
     int k = 0;
     for (int i = 0; i < SIZE; i++) {
@@ -15,10 +15,10 @@ int sumFood(int (*food)[SIZE]) {
             k += food[i][j];
         }
     }
-    //cout << "Sobraram:" << k << endl;
     return k;
 }
 
+//Metodo que inicializa o ambiente sem comida nenhuma
 void startEnviroment(int (*enviroment)[SIZE]) {
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
@@ -26,7 +26,7 @@ void startEnviroment(int (*enviroment)[SIZE]) {
         }
     }
 }
-
+//Metodo que inicializa a população em posições aleatórias
 vector<Individual> startPopulation(int size) {
     vector<Individual> population;
     for (int i = 0; i < START_POPULATION; i++) {
@@ -39,6 +39,7 @@ vector<Individual> startPopulation(int size) {
     return population;
 }
 
+//metodo que adiciona comida ao ambiente
 void generateFood(int (*enviroment)[SIZE]) {
     for (int i = 0; i < FOOD_AMOUNT; i++) {
         int x_randm = rand() % SIZE;
@@ -47,6 +48,7 @@ void generateFood(int (*enviroment)[SIZE]) {
     }
 }
 
+//Método que gera um novo individuo através de um individuo pai
 Individual born(Individual parent) {
     Individual aux = parent;
     int x = rand() % SIZE;
@@ -54,24 +56,15 @@ Individual born(Individual parent) {
     aux.foodEated = 0;
     aux.setHome(x, y);
     float randm = (float)rand() / RAND_MAX;
-    float randm2 = (float)rand() / RAND_MAX;
     float mutation = (((float)rand() / RAND_MAX) * MUTATION_RATE);
-    float mutation2 = (((float)rand() / RAND_MAX) * MUTATION_RATE);
     if (randm > 0.5) {
         aux.genes[0] = aux.genes[0] + mutation;
     } else {
         aux.genes[0] = aux.genes[0] - mutation;
     }
-    if (randm2 > 0.5) {
-        aux.genes[1] = aux.genes[1] + mutation2;
-    } else {
-        aux.genes[1] = aux.genes[1] - mutation2;
-    }
-
-    aux.stepsToGo = aux.genes[1] * 10;
     return aux;
 }
-
+//Metodo que retorna o tamanho médio do bico na população
 vector<float> meanBeakSize(vector<Individual> population) {
     vector<Individual>::iterator it;
     vector<float> mean;
@@ -84,14 +77,11 @@ vector<float> meanBeakSize(vector<Individual> population) {
 
     mean[0] = mean[0] / population.size();
     mean[1] = mean[1] / population.size();
-    //cout << "BICO MEDIO: " << mean[0] << endl;
-    //cout << "VELOCIDADE MEDIA: " << mean[1] << endl;
-    //cout << "PROP: " << (mean[0]) / FOOD_SIZE << endl;
     return mean;
 }
 
 int main(int argc, char const *argv[]) {
-    ofstream graphicData;
+    ofstream graphicData;  //arquivos para plotar gráficos e gerar a animação
     ofstream movesData;
     ofstream foodData;
     graphicData.open("data5.txt");
@@ -100,6 +90,7 @@ int main(int argc, char const *argv[]) {
     graphicData << SIZE << " " << FOOD_SIZE << " " << FOOD_AMOUNT << " " << MUTATION_RATE << " " << GENERATIONS << " " << START_POPULATION << endl;
     srand(10);
     bool extintion = false;
+
     //start enviroment
     int enviroment[SIZE][SIZE];
     startEnviroment(enviroment);
@@ -111,12 +102,14 @@ int main(int argc, char const *argv[]) {
     for (int k = 0; k < GENERATIONS; k++) {
         //generate food
         generateFood(enviroment);
+        //Enviar informações da comida para arquivo de dados
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 foodData << enviroment[i][j] << " ";
             }
             foodData << endl;
         }
+        //Enviar dados da população para arquivo de dados
         movesData << population.size() << endl;
 
         for (iterador = population.begin(); iterador < population.end(); iterador++) {
@@ -125,23 +118,7 @@ int main(int argc, char const *argv[]) {
             movesData << first << " " << second << endl;
         }
 
-        //***********************************************
-        /* vector<Individual>::iterator itAux;
-        queue<Individual *> q;
-        for (itAux = population.begin(); itAux < population.end(); itAux++) {
-            if ((*itAux).stepsToGo > 0) {
-                //cout << (*itAux).stepsToGo << " ";
-                q.push(&(*itAux));
-            }
-        }
-        while (!q.empty()) {
-            q.front()->move(SIZE - 1, enviroment);
-            if (q.front()->stepsToGo > 0) {
-                q.push(q.front());
-            }
-            q.pop();
-        } */
-        //Move population
+        //Realizar o movimento dos individuos da população, cada individuo se move em ordem no mapa um numero fixo de vezes
         for (int i = 0; i < MOVES_PER_TURN; i++) {
             vector<Individual>::iterator it;
             for (it = population.begin(); it < population.end(); it++) {
@@ -151,25 +128,19 @@ int main(int argc, char const *argv[]) {
                 movesData << first << " " << second << endl;
             }
         }
+        //dado que indica o dim de um dia enviado para o arquivo de dados
         movesData << "-1 -1 " << k << endl;
 
+        //Identificar os individuos que 'morreram' ou reproduziram
         vector<Individual>::iterator it;
-        int toRemove = 0;
-        int toDuplicate = 0;
         vector<Individual> newIndividuals;
-        // cout << "Population SIZE: " << population.size() << endl;
         for (it = population.begin(); it < population.end(); it++) {
-            //cout << "comeu: " << (*it).foodEated << endl;
-            //cout << (*it).foodEated << " ";
-
             bool erased = false;
             if ((*it).foodEated >= 70) {
                 newIndividuals.push_back(born(*it));
-                //toDuplicate++;
             }
             if ((*it).foodEated < 15) {
                 population.erase(it--);
-                //toRemove++;
                 erased = true;
             }
             if (!erased) {
@@ -178,29 +149,27 @@ int main(int argc, char const *argv[]) {
                 /* code */
             }
         }
-        //cout << endl;
-        //movesData << population.size() << endl;
+
+        //Verificar se a população foi extinta
         if (population.size() == 0) {
             extintion = true;
             break;
         }
-
+        //Adicionar novos individuos a população
         if (newIndividuals.size() != 0) {
             population.insert(population.end(), newIndividuals.begin(), newIndividuals.end());
-            /* code */
         }
 
-        //cout << "GERACAO " << k << ": pop->" << population.size() << endl;
+        //Enviar dados para os arquivos
         vector<float> mean = meanBeakSize(population);
         graphicData << population.size() << " " << sumFood(enviroment) + FOOD_AMOUNT << " " << mean[0] << " " << mean[1] << endl;
-        //**************************************
     }
     graphicData << extintion;
     if (extintion) {
         cout << "A Populacao foi extinta F" << endl;
         /* code */
     }
-
+    //printar o restante de comida
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
             cout << enviroment[i][j] << " ";

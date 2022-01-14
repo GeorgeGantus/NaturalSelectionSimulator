@@ -8,7 +8,7 @@
 
 #include "../configs/globals.h"
 using namespace std;
-Individual::Individual(int x, int y) {
+Individual::Individual(int x, int y) {  //Construtor do individuo
     this->x = x;
     this->y = y;
     home.first = x;
@@ -20,21 +20,21 @@ Individual::Individual(int x, int y) {
     foodEated = 0;
 }
 
-void Individual::move(int limit, int (*food)[SIZE]) {
+void Individual::move(int limit, int (*food)[SIZE]) {  //método que movimenta o individuo
     float randm = (float)rand() / RAND_MAX;
-    if (randm < 0.25) {  //move up
+    if (randm < 0.25) {  //subir
         if (y < limit) {
             y++;
         }
-    } else if (randm < 0.5) {  //move right
+    } else if (randm < 0.5) {  //direita
         if (x < limit) {
             x++;
         }
-    } else if (randm < 0.75) {  //move down
+    } else if (randm < 0.75) {  //descer
         if (y > 0) {
             y--;
         }
-    } else {  //move left
+    } else {  //esquerda
         if (x > 0) {
             x--;
         }
@@ -43,7 +43,7 @@ void Individual::move(int limit, int (*food)[SIZE]) {
     position.first = x;
     position.second = y;
     path.insert(position);
-
+    //se encontrar comida --> coma
     if (food[x][y] != 0) {
         food[x][y]--;
         eat();
@@ -52,15 +52,15 @@ void Individual::move(int limit, int (*food)[SIZE]) {
 
     stepsToGo--;
     stepsWent++;
-    //foodEated -= ENVIROMENT_NOISE * pow(stepsWent, 2);
 }
-pair<int, int> Individual::getPosition() {
+pair<int, int> Individual::getPosition() {  //obtem a posição de um individuo
     pair<int, int> position;
     position.first = x;
     position.second = y;
     return position;
 }
 
+//Metodo que retorna um individuo a sua posição inicial
 void Individual::goHome() {
     x = home.first;
     y = home.second;
@@ -68,10 +68,12 @@ void Individual::goHome() {
     stepsWent = 0;
 }
 
+//Define a posição inicial do individuo
 void Individual::setHome(int x, int y) {
     home.first = x;
     home.second = y;
 }
+//metodo que representa a alimentação
 void Individual::eat() {
     if (genes[0] / FOOD_SIZE > 1.5) {
         foodEated += (1 - ((genes[0] / FOOD_SIZE) / 10)) * 20;
